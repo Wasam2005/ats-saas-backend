@@ -1,5 +1,7 @@
 import { createOrganizationWithOwner,authenticateUser,refreshTokenService} from "../services/auth.service.js";
 import { logWarn, logError, logInfo } from "../utils/logger.util.js";
+import { conflict, serverError, unauthorized } from "../utils/response.util.js";
+
 
 //User registeration controller
 export const registerUser = async (req,res) =>
@@ -18,47 +20,34 @@ return res.status(201).json({
 catch(error){
    
 if(error.message==="USER_EXISTS"){
-     logWarn("register_failed", {
-    email,
+   return conflict(res, {
     reason: "user_already_exists",
-    message: "Registration failed due to duplicate user",
+    source: "registerUser",
+    message: "User already exists",
+    meta: { email },
   });
-    return res.status(409).json({
-      success: false,
-      message: "User already exists"});
 }
 
 
 
 if (error.message === "ORGANIZATION_ALREADY_EXISTS") {
-      logWarn("register_failed", {
-    email,
-     reason: "organization_already_exists",
-    message: "Registration failed because organization already exists",
-  });
-  return res.status(409).json({
-    success: false,
+  return conflict(res, {
+    reason: "organization_already_exists",
+    source: "registerUser",
     message: "Organization already exists",
+    meta: { email },
   });
 }
 
-if (error.message === "SESSION_REQUIRED") {
-      logWarn("register_failed", {
-  email,
-  reason: "session_missing",
+return serverError(res, {
+  error,
+  source: "registerUser",
+  context: "register_server_error",
 });
-}
-
-logError("register_server_error", {
-  email,
-  reason: error.message,
-  message: "Unexpected server error during registration",
-});
-return res.status(500).json({
-  success: false,
-  message: "Server error"});
 }
 };
+
+
 
 // User Login controller
 export const loginUser = async (req, res) => {
@@ -76,37 +65,45 @@ export const loginUser = async (req, res) => {
 logInfo("login_success", {
   email,
   message: "User logged in successfully",
+  source: "loginUser",
 });
     return res.status(200).json({
       success: true,
       data: {
         accessToken,
-         refreshToken
+      
       },
       message: "User logged in successfully",
     });
   } catch (error) {
 
-    if (error.message === "USER_NOT_FOUND" || error.message === "PASSWORD_MISMATCH" ) {
-
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+    if (error.message === "USER_NOT_FOUND" || error.message === "PASSWORD_MISMATCH" || error.message === "USER_INACTIVE") {
+      return unauthorized(res, {
+    reason: "invalid_credentials",
+    source: "loginUser",
+    message: "Invalid credentials",
+    log: false,
+  });
     }
 
-    logError("login_server_error", {
-  email,
-  reason: error.message,
-  message: "Unexpected server error during login",
+if (error.message === "TOKEN_CREATION_FAILED") {
+    return serverError(res, {
+    error,
+    source: "loginUser",
+    context: "login_token_creation_failed",
+    log: false,
+  });
+}
+
+return serverError(res, {
+  error,
+  source: "loginUser",
+  context: "login_server_error",
 });
 
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
   }
 };
+
 
 // Handles refresh token request
 export const refreshAccessToken = async (req, res) => {
@@ -114,12 +111,10 @@ export const refreshAccessToken = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
    
     if (!refreshToken) {
-    logWarn("refresh_token_missing", {
-  message: "Refresh token cookie missing",
-});
-  return res.status(401).json({
-    success: false,
-    message: "Unauthorized",
+       return unauthorized(res, {
+    reason: "refresh_token_missing",
+    source: "refreshAccessToken",
+    message: "Refresh token cookie missing",
   });
 }
 
@@ -146,20 +141,26 @@ export const refreshAccessToken = async (req, res) => {
   } catch (error) {
 
  if(error.message === "UNAUTHORIZED" || error.message === "EXPIRED") {
-  return res.status(401).json({
-    success: false,
-    message: "Unauthorized",
+   return unauthorized(res, {
+    reason: "invalid_refresh_token",
+    source: "refreshAccessToken",
+    log: false,
   });
 }
 
- logError("refresh_token_server_error", {
-      reason: error.message,
-      message: "Unexpected server error during refresh token flow",
-    });
+ if (error.message === "SESSION_RECOVERY_REQUIRED") {
+      return serverError(res, {
+    error,
+    source: "refreshAccessToken",
+    context: "session_recovery_required",
+    log: false,
+  });
+  }
 
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
+   return serverError(res, {
+  error,
+  source: "refreshAccessToken",
+  context: "refresh_token_server_error",
+});
   }
 };

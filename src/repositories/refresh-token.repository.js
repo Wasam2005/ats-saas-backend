@@ -4,10 +4,15 @@ export const createRefreshToken = (data) => {
   return RefreshToken.create(data);
 };
 
-export const findRefreshToken = (hashedToken) => {
-  return RefreshToken.findOne({ token: hashedToken });
+export const findAndDeleteRefreshTokenByHash = (hashedToken) => {
+  return RefreshToken.findOneAndDelete(
+    { token: hashedToken },
+    {
+      projection: { userId: 1, expiresAt: 1 }
+    }
+  ).lean();
 };
 
-export const deleteRefreshTokenById = (id) => {
-  return RefreshToken.deleteOne({ _id: id });
+export const deleteAllRefreshTokensByUser = (userId) => {
+  return RefreshToken.deleteMany({ userId });
 };

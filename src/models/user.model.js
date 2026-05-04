@@ -36,8 +36,24 @@ const userSchema = new Schema(
       default: "recruiter",
       required: true,
     },
+
+    isActive: {
+  type: Boolean,
+  default: true,
+  index: true,
+}
+
   },
   { timestamps: true }
 );
+
+userSchema.index(
+  { organizationId: 1, role: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { role: "owner" },
+  }
+);
+
 
 export default mongoose.model("User", userSchema);

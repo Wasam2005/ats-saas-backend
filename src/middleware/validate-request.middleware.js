@@ -1,99 +1,74 @@
 import { isNonEmptyString, isValidEmail, isValidPassword ,isValidCompanyDomain} from "../utils/validators.util.js";
 import { logWarn } from "../utils/logger.util.js";
 import { sanitizeString } from "../utils/sanitizers.util.js";
+import { badRequest } from "../utils/response.util.js";
 
 export const validateRegisterInput = (req,res,next) =>{
-let{name,email,password,organizationName,companyDomain} = req.body;
+let{ name, email, password, organizationName, companyDomain } = req.body;
 name = sanitizeString(name);
 organizationName=  sanitizeString(organizationName);
 email=email?.trim().toLowerCase();
 companyDomain=companyDomain?.trim().toLowerCase();
 
 if(!isNonEmptyString(name)){
-    logWarn("register_validation_failed", {
-    reason: "invalid_name",
-    message: "Invalid or missing name in registration request",
-  });
-
-return res.status(400).json({
-    success: false,
-    message: "Valid name is required",
-})
+  return badRequest(res, {
+      reason: "invalid_name",
+      source: "validateRegisterInput",
+      message: "Valid name is required",
+    });
 }
 
 if(!isNonEmptyString(companyDomain)){
-    logWarn("register_validation_failed", {
-    reason: "invalid_domain",
-    message: "Invalid or missing domain in registration request",
-  });
-
-return res.status(400).json({
-    success: false,
-    message: "Valid company domain is required",
-})
+    return badRequest(res, {
+      reason: "invalid_organization_name",
+      source: "validateRegisterInput",
+      message: "Valid organization name is required",
+    });
 }
-
-
 
 if(!isNonEmptyString(organizationName)){
-    logWarn("register_validation_failed", {
-    reason: "invalid_organization_name",
-    message: "Invalid or missing organization name in registration request",
-  });
-
-return res.status(400).json({
-    success: false,
-    message: "Valid organization name is required",
-})
+    return badRequest(res, {
+      reason: "invalid_organization_name",
+      source: "validateRegisterInput",
+      message: "Valid organization name is required",
+    });
 }
 
-if(!isNonEmptyString(email)){
-    logWarn("register_validation_failed",{
-    reason: "invalid_email",
-    message: "Invalid email format in registration request",
-    })
 
-    return res.status(400).json({
-        success:false,
-        message: "Valid email is required",
-    })
-}
+  if (!isNonEmptyString(email) || !isValidEmail(email)) {
+    return badRequest(res, {
+      reason: "invalid_email",
+      source: "validateRegisterInput",
+      message: "Valid email is required",
+    });
+  }
+
 
 
 if(!isValidCompanyDomain(companyDomain)){
-     logWarn("register_validation_failed", {
-      reason: "invalid_domain",
-      message: "Invalid company domain in registration request",
-    });
-
-    return res.status(400).json({
-      success: false,
-      message: "Invalid company domain ",
+   return badRequest(res, {
+      reason: "invalid_company_domain",
+      source: "validateRegisterInput",
+      message: "Valid company domain is required",
     });
 }
-
-
 
 
 if(!isValidPassword(password)){
-     logWarn("register_validation_failed", {
+  return badRequest(res, {
       reason: "invalid_password",
-      message: "Invalid password in registration request",
-    });
-
-    return res.status(400).json({
-      success: false,
+      source: "validateRegisterInput",
       message: "Password must be between 8 and 128 characters",
     });
-}
+  }
+  
   req.body.name = name;
   req.body.email = email;
   req.body.organizationName = organizationName;
+  req.body.companyDomain = companyDomain;
 
   next();
 }
-
-
 
 
 
@@ -103,25 +78,17 @@ export const validateLoginInput = (req, res, next) => {
   email = email?.trim().toLowerCase();
 
   if (!isValidEmail(email)) {
-    logWarn("login_validation_failed", {
+    return badRequest(res, {
       reason: "invalid_email",
-      message: "Invalid email format in login request",
-    });
-
-    return res.status(400).json({
-      success: false,
+      source: "validateLoginInput",
       message: "Valid email is required",
     });
   }
 
   if (!isValidPassword(password)) {
-    logWarn("login_validation_failed", {
+     return badRequest(res, {
       reason: "invalid_password",
-      message: "Invalid password in login request",
-    });
-
-    return res.status(400).json({
-      success: false,
+      source: "validateLoginInput",
       message: "Password must be between 8 and 128 characters",
     });
   }

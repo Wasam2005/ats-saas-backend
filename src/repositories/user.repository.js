@@ -1,15 +1,8 @@
 import User from "../models/user.model.js";
 
-
-
-  
-
-
-
-
 export const findUserForAuth = async (userId) => {
   return User.findById(userId)
-    .select("_id role organizationId")
+    .select("_id role organizationId isActive")
     .lean();
 };
 
@@ -22,8 +15,5 @@ export const findUserById = (userId) => {
 };
 
 export const createUser = (data, session) => {
-if (!session) {
-    throw new Error("SESSION_REQUIRED");
-  }
   return User.create([data], { session });
 };
