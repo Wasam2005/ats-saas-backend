@@ -7,7 +7,9 @@ export const isNonEmptyString = (value) => {
 };
 
 export const isValidCompanyDomain = (value) => {
+  if (!isNonEmptyString(value)) return false;
   const normalizedValue = value.trim().toLowerCase();
+   
 
   const domainRegex = /^[a-z0-9.-]+\.[a-z]{2,}$/;
 

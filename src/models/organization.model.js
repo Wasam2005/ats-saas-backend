@@ -15,6 +15,7 @@ const organizationSchema = new Schema(
       ref: "User",
       index: true,
     },
+    
     companyDomain: {
      type: String,
       required: true,

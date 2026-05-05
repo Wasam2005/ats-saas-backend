@@ -51,9 +51,9 @@ return serverError(res, {
 
 // User Login controller
 export const loginUser = async (req, res) => {
-  let { email, password } = req.body;
+  let { email, password, companyDomain } = req.body;
   try {
-    const {accessToken,refreshToken}= await authenticateUser({ email, password });
+    const {accessToken,refreshToken}= await authenticateUser({ email, password,companyDomain });
 
    res.cookie("refreshToken", refreshToken, {
   httpOnly: true,
@@ -77,12 +77,11 @@ logInfo("login_success", {
     });
   } catch (error) {
 
-    if (error.message === "USER_NOT_FOUND" || error.message === "PASSWORD_MISMATCH" || error.message === "USER_INACTIVE") {
+    if (error.message === "INVALID_CREDENTIALS") {
       return unauthorized(res, {
     reason: "invalid_credentials",
     source: "loginUser",
     message: "Invalid credentials",
-    log: false,
   });
     }
 

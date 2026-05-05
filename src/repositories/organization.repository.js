@@ -8,3 +8,9 @@ export const updateOrganizationOwner = (organization, ownerId, session) => {
   organization.ownerId = ownerId;
   return organization.save({ session });
 };
+
+export const findOrganizationByDomain = (companyDomain) => {
+  return Organization.findOne({ companyDomain })
+    .select("_id")
+    .lean();
+};

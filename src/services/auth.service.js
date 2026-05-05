@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import {hashToken , issueTokens } from "../utils/token.util.js";
 import { logWarn, logError, logInfo } from "../utils/logger.util.js";
 import mongoose from "mongoose";
-import { createOrganization, updateOrganizationOwner } from "../repositories/organization.repository.js";
+import { createOrganization, updateOrganizationOwner,  findOrganizationByDomain} from "../repositories/organization.repository.js";
 import { createUser, findUserByEmail , findUserById} from "../repositories/user.repository.js";
 import { createRefreshToken, findAndDeleteRefreshTokenByHash, deleteAllRefreshTokensByUser } from "../repositories/refresh-token.repository.js";
 
@@ -62,36 +62,25 @@ await updateOrganizationOwner(organization, user._id, session);
 
  
 
-export const authenticateUser = async ({ email, password }) => {
-  const existingUser = await findUserByEmail(email);
- if (!existingUser) {
-  logWarn("login_auth_failed", {
-  email,
-  reason: "USER_NOT_FOUND",
-  source: "authenticateUser"
-});
-  throw new Error("USER_NOT_FOUND");
-}
-if (!existingUser.isActive) {
-  logWarn("login_auth_failed", {
-    email,
-    reason: "USER_INACTIVE",
-    source: "authenticateUser"
-  });
+export const authenticateUser = async ({ email, password, companyDomain  }) => {
 
-  throw new Error("USER_INACTIVE");
+const organization = await findOrganizationByDomain(companyDomain);
+
+if (!organization) {
+  throw new Error("INVALID_CREDENTIALS");
 }
+  
+const existingUser = await findUserByEmail(email, organization._id);
+
+ if (!existingUser || !existingUser.isActive) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
 
   const isMatch = await bcrypt.compare(password, existingUser.password);
 
   if (!isMatch) {
-    logWarn("login_auth_failed", {
-  email,
-  reason: "PASSWORD_MISMATCH",
-  source: "authenticateUser"
-});
-  throw new Error("PASSWORD_MISMATCH");
-}
+    throw new Error("INVALID_CREDENTIALS");
+  }
 
 
 const {accessToken,rawRefreshToken,hashedToken,expiresAt} = issueTokens(existingUser._id);
@@ -103,11 +92,11 @@ try {
     expiresAt,
   });
 } catch (error) {
-  logError("login_token_creation_failed", {
-    userId: existingUser._id,
-    reason: "token_creation_failed",
-    source: "authenticateUser"
-  });
+    logError("login_token_creation_failed", {
+      error,
+      userId: existingUser._id,
+      source: "authenticateUser",
+    });
 
   throw new Error("TOKEN_CREATION_FAILED");
 }

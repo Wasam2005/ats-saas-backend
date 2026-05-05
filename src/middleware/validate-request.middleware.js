@@ -73,9 +73,10 @@ if(!isValidPassword(password)){
 
 
 export const validateLoginInput = (req, res, next) => {
-  let { email, password } = req.body;
+  let { email, password,companyDomain  } = req.body;
 
   email = email?.trim().toLowerCase();
+  companyDomain=companyDomain?.trim().toLowerCase();
 
   if (!isValidEmail(email)) {
     return badRequest(res, {
@@ -93,7 +94,15 @@ export const validateLoginInput = (req, res, next) => {
     });
   }
 
+  if (!isValidCompanyDomain(companyDomain)) {
+  return badRequest(res, {
+    reason: "invalid_company_domain",
+    source: "validateLoginInput",
+  });
+}
+
   req.body.email = email;
+  req.body.companyDomain = companyDomain;
 
   next();
 };

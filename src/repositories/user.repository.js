@@ -6,8 +6,8 @@ export const findUserForAuth = async (userId) => {
     .lean();
 };
 
-export const findUserByEmail = (email) => {
-  return User.findOne({ email });
+export const findUserByEmail = (email, organizationId) => {
+  return User.findOne({ email, organizationId });
 };
 
 export const findUserById = (userId) => {

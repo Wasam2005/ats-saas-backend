@@ -15,7 +15,6 @@ const userSchema = new Schema(
       required: true,
       lowercase: true,
       trim: true,
-      unique: true,
     },
 
     password: {
@@ -55,5 +54,9 @@ userSchema.index(
   }
 );
 
+userSchema.index(
+  { email: 1, organizationId: 1 },
+  { unique: true }
+);
 
 export default mongoose.model("User", userSchema);
