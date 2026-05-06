@@ -1,8 +1,9 @@
-import { isNonEmptyString, isValidEmail, isValidPassword ,isValidCompanyDomain} from "../utils/validators.util.js";
+import { isNonEmptyString, isValidEmail, isValidPassword ,isValidCompanyDomain, isValidSkillsArray} from "../utils/validators.util.js";
 import { logWarn } from "../utils/logger.util.js";
-import { sanitizeString } from "../utils/sanitizers.util.js";
+import { sanitizeString, sanitizeSkills } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
 
+// Validate and sanitize register input
 export const validateRegisterInput = (req,res,next) =>{
 let{ name, email, password, organizationName, companyDomain } = req.body;
 name = sanitizeString(name);
@@ -34,7 +35,6 @@ if(!isNonEmptyString(organizationName)){
     });
 }
 
-
   if (!isNonEmptyString(email) || !isValidEmail(email)) {
     return badRequest(res, {
       reason: "invalid_email",
@@ -43,8 +43,6 @@ if(!isNonEmptyString(organizationName)){
     });
   }
 
-
-
 if(!isValidCompanyDomain(companyDomain)){
    return badRequest(res, {
       reason: "invalid_company_domain",
@@ -52,7 +50,6 @@ if(!isValidCompanyDomain(companyDomain)){
       message: "Valid company domain is required",
     });
 }
-
 
 if(!isValidPassword(password)){
   return badRequest(res, {
@@ -71,7 +68,7 @@ if(!isValidPassword(password)){
 }
 
 
-
+// Validate and sanitize login input
 export const validateLoginInput = (req, res, next) => {
   let { email, password,companyDomain  } = req.body;
 
@@ -104,5 +101,49 @@ export const validateLoginInput = (req, res, next) => {
   req.body.email = email;
   req.body.companyDomain = companyDomain;
 
+  next();
+};
+
+
+// Validate and sanitize candidate input
+export const validateCandidateInput = (req, res, next) => {
+  let { name, email, phone, skills } = req.body;
+
+  name = sanitizeString(name);
+  email = email?.trim().toLowerCase();
+  phone = phone?.trim();
+
+  
+  skills = sanitizeSkills(skills);
+
+
+  if (!isNonEmptyString(name)) {
+    return badRequest(res, {
+      reason: "invalid_candidate_name",
+      source: "validateCandidateInput",
+      message: "Valid candidate name is required",
+    });
+  }
+
+  if (!isValidEmail(email)) {
+    return badRequest(res, {
+      reason: "invalid_candidate_email",
+      source: "validateCandidateInput",
+      message: "Valid candidate email is required",
+    });
+  }
+
+  if (!isValidSkillsArray(skills)) {
+    return badRequest(res, {
+      reason: "invalid_candidate_skills",
+      source: "validateCandidateInput",
+      message: "Skills must be a valid string array",
+    });
+  }
+
+req.body.name = name;
+req.body.email = email;
+req.body.phone = phone;
+req.body.skills = skills;
   next();
 };

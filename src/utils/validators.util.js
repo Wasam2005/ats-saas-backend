@@ -33,3 +33,14 @@ export const isValidPassword = (password) => {
 
   return true;
 };
+
+
+export const isValidSkillsArray = (skills) => {
+  if (!Array.isArray(skills)) return false;
+
+  return skills.every(
+    (skill) =>
+      typeof skill === "string" &&
+      skill.trim() !== ""
+  );
+};

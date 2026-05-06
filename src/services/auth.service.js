@@ -8,7 +8,10 @@ import { createRefreshToken, findAndDeleteRefreshTokenByHash, deleteAllRefreshTo
 
 
 export const createOrganizationWithOwner= async({name,email,password,organizationName,companyDomain }) => {
-    const session = await mongoose.startSession();
+    email = email?.trim().toLowerCase();
+companyDomain = companyDomain?.trim().toLowerCase();
+  
+  const session = await mongoose.startSession();
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -63,6 +66,8 @@ await updateOrganizationOwner(organization, user._id, session);
  
 
 export const authenticateUser = async ({ email, password, companyDomain  }) => {
+email = email?.trim().toLowerCase();
+companyDomain = companyDomain?.trim().toLowerCase();
 
 const organization = await findOrganizationByDomain(companyDomain);
 

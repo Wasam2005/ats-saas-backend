@@ -9,3 +9,17 @@ export const sanitizeString = (value) => {
 
   return sanitizedValue;
 };
+
+export const sanitizeSkills = (skills) => {
+  if (!Array.isArray(skills)) return [];
+
+  return [
+    ...new Set(
+      skills
+        .map((skill) =>
+          sanitizeString(skill).toLowerCase()
+        )
+        .filter(Boolean)
+    ),
+  ];
+};
