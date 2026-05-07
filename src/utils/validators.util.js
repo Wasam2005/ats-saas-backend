@@ -44,3 +44,13 @@ export const isValidSkillsArray = (skills) => {
       skill.trim() !== ""
   );
 };
+
+export const isValidPhoneNumber = (phone) => {
+  if (!isNonEmptyString(phone)) return false;
+
+  const normalizedPhone = phone.trim();
+
+  const phoneRegex = /^\+?[1-9]\d{7,14}$/;
+
+  return phoneRegex.test(normalizedPhone);
+};

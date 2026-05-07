@@ -1,6 +1,7 @@
 import {createCandidateService,getCandidatesService,getCandidateByIdService} from "../services/candidate.service.js";
 import {badRequest,conflict,serverError} from "../utils/response.util.js";
 import { logInfo } from "../utils/logger.util.js";
+import { serializeCandidate } from "../utils/serializers.util.js";
 
 
 export const createCandidate = async (req, res) => {
@@ -26,7 +27,7 @@ export const createCandidate = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      data: candidate,
+      data: serializeCandidate(candidate),
       message: "Candidate created successfully",
     });
   } catch (error) {
@@ -56,7 +57,7 @@ export const getCandidates = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      data: candidates,
+      data: candidates.map(serializeCandidate),
     });
   } catch (error) {
     return serverError(res, {
@@ -78,7 +79,7 @@ const candidate = await getCandidateByIdService(candidateId,organizationId);
 
     return res.status(200).json({
       success: true,
-      data: candidate,
+      data: serializeCandidate(candidate),
     });
   } catch (error) {
     if (error.message === "CANDIDATE_NOT_FOUND") {

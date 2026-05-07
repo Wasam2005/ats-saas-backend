@@ -1,7 +1,15 @@
-import { isNonEmptyString, isValidEmail, isValidPassword ,isValidCompanyDomain, isValidSkillsArray} from "../utils/validators.util.js";
+import { 
+  isNonEmptyString, 
+  isValidEmail, 
+  isValidPassword ,
+  isValidCompanyDomain, 
+  isValidSkillsArray,
+  isValidPhoneNumber
+} from "../utils/validators.util.js";
 import { logWarn } from "../utils/logger.util.js";
 import { sanitizeString, sanitizeSkills } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
+import mongoose from "mongoose";
 
 // Validate and sanitize register input
 export const validateRegisterInput = (req,res,next) =>{
@@ -141,9 +149,33 @@ export const validateCandidateInput = (req, res, next) => {
     });
   }
 
+  if (phone && !isValidPhoneNumber(phone)) {
+  return badRequest(res, {
+    reason: "invalid_candidate_phone",
+    source: "validateCandidateInput",
+    message: "Valid candidate phone number is required",
+  });
+}
+  
+
 req.body.name = name;
 req.body.email = email;
 req.body.phone = phone;
 req.body.skills = skills;
   next();
+};
+
+// Validate ObjectId
+export const validateObjectId = (paramName ="id") => {
+  return (req, res, next) => {
+  const value = req.params?.[paramName];
+    if(!mongoose.Types.ObjectId.isValid(value)){
+      return badRequest(res, {
+        reason:"invalid_object_id",
+        source:"validateObjectId",
+        message:"Invalid resource id"
+      });
+    }
+    next();
+  };
 };
