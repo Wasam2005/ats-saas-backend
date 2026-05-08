@@ -9,3 +9,17 @@ export const serializeCandidate = (candidate) => {
         updatedAt:candidate.updatedAt,
     };
 };
+
+export const serializeJob = (job) => {
+  if (!job) return null;
+  return {
+    id: job._id,
+    title: job.title,
+    description: job.description,
+    status: job.status,
+    organizationId: job.organizationId,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+  };
+};
+

@@ -23,3 +23,11 @@ export const sanitizeSkills = (skills) => {
     ),
   ];
 };
+
+
+export const sanitizeJobStatus = (status) => {
+  if (typeof status !== "string") {
+    return "";
+  }
+  return sanitizeString(status).toLowerCase();
+};

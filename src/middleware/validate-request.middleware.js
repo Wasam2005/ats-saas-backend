@@ -1,13 +1,15 @@
 import { 
-  isNonEmptyString, 
+  isNonEmptyString,
   isValidEmail, 
   isValidPassword ,
   isValidCompanyDomain, 
   isValidSkillsArray,
-  isValidPhoneNumber
+  isValidPhoneNumber,
+  isValidTitle,
+  isValidDescription,
+  isValidJobStatus
 } from "../utils/validators.util.js";
-import { logWarn } from "../utils/logger.util.js";
-import { sanitizeString, sanitizeSkills } from "../utils/sanitizers.util.js";
+import { sanitizeString, sanitizeSkills, sanitizeJobStatus } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
 import mongoose from "mongoose";
 
@@ -27,13 +29,6 @@ if(!isNonEmptyString(name)){
     });
 }
 
-if(!isNonEmptyString(companyDomain)){
-    return badRequest(res, {
-      reason: "invalid_organization_name",
-      source: "validateRegisterInput",
-      message: "Valid organization name is required",
-    });
-}
 
 if(!isNonEmptyString(organizationName)){
     return badRequest(res, {
@@ -43,7 +38,7 @@ if(!isNonEmptyString(organizationName)){
     });
 }
 
-  if (!isNonEmptyString(email) || !isValidEmail(email)) {
+  if (!isValidEmail(email)) {
     return badRequest(res, {
       reason: "invalid_email",
       source: "validateRegisterInput",
@@ -179,3 +174,49 @@ export const validateObjectId = (paramName ="id") => {
     next();
   };
 };
+
+
+// Validate and sanitize job input
+export const validateJobInput = (req,res,next) => {
+  let { title, description } = req.body;
+
+  title = sanitizeString(title);
+
+  description =sanitizeString(description);
+
+  if (!isValidTitle(title)){
+    return badRequest(res, {
+      reason: "invalid_job_title",
+      source: "validateJobInput",
+      message: "Job title must be between 3 and 100 characters",
+    });
+  }
+
+  if (!isValidDescription(description)){
+    return badRequest(res, {
+      reason: "invalid_job_description",
+      source: "validateJobInput",
+      message: "Job description must be between 10 and 5000 characters",
+    });
+  }
+
+  req.body.title = title;
+
+  req.body.description = description;
+  next();
+};
+
+export const validateJobStatus = (req, res, next) => {
+    let { status } = req.query;
+
+if (status !== undefined) status = sanitizeJobStatus(status);
+if (!isValidJobStatus(status)) {
+      return badRequest(res, {
+        reason: "invalid_job_status",
+        source: "validateJobStatus",
+        message: "Invalid job status",
+      });
+    }
+    req.query.status = status;
+    next();
+  };

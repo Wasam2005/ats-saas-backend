@@ -54,3 +54,23 @@ export const isValidPhoneNumber = (phone) => {
 
   return phoneRegex.test(normalizedPhone);
 };
+
+
+export const isValidTitle = (title) => {
+  if(!isNonEmptyString(title) || title.length < 3 || title.length > 100 ) return false;
+   return true;
+}
+export const isValidDescription = (description) => {
+  if (!isNonEmptyString(description) || description.length < 10 || description.length > 5000)
+    return false;
+  return true;
+};
+
+export const isValidJobStatus = (status) => {
+  if (!isNonEmptyString(status)) return false;
+  
+
+  const allowedStatuses = ["draft","open","closed"];
+
+  return allowedStatuses.includes(status);
+};
