@@ -19,11 +19,7 @@ export const createCandidate = async (req, res) => {
       organizationId,
     });
 
-    logInfo("candidate_created", {
-      candidateId: candidate._id,
-      organizationId,
-      source: "createCandidate",
-    });
+  
 
     return res.status(201).json({
       success: true,

@@ -20,7 +20,12 @@ export const createJobService = async ({title,description,organizationId}) => {
       organizationId,
     });
 
-
+    logInfo("job_created", {
+      jobId: job._id,
+      organizationId,
+      source: "createJobService",
+    });
+    
     return job;
   } catch (error) {
     logError("job_creation_failed", error, {

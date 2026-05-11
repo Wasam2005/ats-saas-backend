@@ -9,7 +9,7 @@ const jobSchema = new Schema(
       trim: true,
       required: true,
     },
-
+         
     description: {
       type: String,
       trim: true,

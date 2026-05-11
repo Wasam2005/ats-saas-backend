@@ -7,7 +7,8 @@ import {
   isValidPhoneNumber,
   isValidTitle,
   isValidDescription,
-  isValidJobStatus
+  isValidJobStatus,
+  isValidObjectId
 } from "../utils/validators.util.js";
 import { sanitizeString, sanitizeSkills, sanitizeJobStatus } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
@@ -164,7 +165,7 @@ req.body.skills = skills;
 export const validateObjectId = (paramName ="id") => {
   return (req, res, next) => {
   const value = req.params?.[paramName];
-    if(!mongoose.Types.ObjectId.isValid(value)){
+    if(!isValidObjectId(value)){
       return badRequest(res, {
         reason:"invalid_object_id",
         source:"validateObjectId",
@@ -220,3 +221,27 @@ if (!isValidJobStatus(status)) {
     req.query.status = status;
     next();
   };
+
+  // Validate application input
+export const validateApplicationInput =(req, res, next) => {
+    const { candidateId, jobId } = req.body;
+   
+  if (!candidateId ||!isValidObjectId(candidateId)){
+      return badRequest(res, {
+        reason: "invalid_candidate_id",
+        source: "validateApplicationInput",
+        message: "Valid candidate id is required",
+      });
+    }
+
+    if (!jobId || !isValidObjectId(jobId)){
+      return badRequest(res, {
+        reason: "invalid_job_id",
+        source:"validateApplicationInput",
+        message:"Valid job id is required",
+      });
+    }
+
+    next();
+  };
+  

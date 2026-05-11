@@ -156,7 +156,7 @@ user creation fails
 
 ### Solution
 
-* MongoDB transactions (planned)
+* Implemented MongoDB transactions
 * Ensures:
 
 ```
@@ -250,20 +250,15 @@ Used across:
 * Logging system
 * Multi-tenant architecture design
 * Organization + user modeling
-
----
-
-### 🚧 In Progress
-
 * MongoDB transaction-based onboarding
+* organizationId enforcement in all queries
+* Jobs module
+* Candidates module
 
 ---
 
 ### ⏭ Upcoming
 
-* organizationId enforcement in all queries
-* Jobs module
-* Candidates module
 * Applications module
 * Interviews module
 * Analytics system

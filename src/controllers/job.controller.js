@@ -16,11 +16,6 @@ export const createJob = async (req, res) => {
 
     const job = await createJobService({title,description,organizationId});
 
- logInfo("job_created", {
-      jobId: job._id,
-      organizationId,
-      source: "createJobService",
-    });
 
     return res.status(201).json({
       success: true,

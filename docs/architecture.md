@@ -344,10 +344,7 @@ create organization (ownerId = null)
 → create owner user
 → update ownerId
 
-
-**Planned Improvement:**
-
-* MongoDB transactions for atomic onboarding
+* Used MongoDB transactions for atomic onboarding
 
 -------------------------------------------------------------------
 
@@ -439,7 +436,6 @@ Built using MongoDB Aggregation Pipelines.
 
 # 🚀 Planned Production Enhancements
 
-* MongoDB transactions
 * Redis caching
 * BullMQ queues
 * Cron-based scheduling

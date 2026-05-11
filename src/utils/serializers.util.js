@@ -23,3 +23,14 @@ export const serializeJob = (job) => {
   };
 };
 
+export const serializeApplication = (application) => {
+  return {
+    id: application._id,
+    candidateId:application.candidateId,
+    jobId: application.jobId,
+    stage: application.stage,
+    organizationId:application.organizationId,
+    createdAt:application.createdAt,
+    updatedAt: application.updatedAt,
+  };
+};

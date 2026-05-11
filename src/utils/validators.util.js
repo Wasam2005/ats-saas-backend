@@ -74,3 +74,8 @@ export const isValidJobStatus = (status) => {
 
   return allowedStatuses.includes(status);
 };
+
+
+export const isValidObjectId = (value) => {
+  return mongoose.Types.ObjectId.isValid(value);
+};

@@ -27,7 +27,11 @@ const existingCandidate = await findCandidateByEmail(email,organizationId);
       skills,
       organizationId,
     });
-
+  logInfo("candidate_created", {
+      candidateId: candidate._id,
+      organizationId,
+      source: "createCandidateService",
+    });
 
     return candidate;
   } catch (error) {
