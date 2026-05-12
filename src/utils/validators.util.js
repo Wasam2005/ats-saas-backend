@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export const isNonEmptyString = (value) => {
   if (typeof value !== "string") return false;
 
