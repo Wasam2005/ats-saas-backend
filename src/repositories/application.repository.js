@@ -47,3 +47,11 @@ export const findApplicationsByCandidate =(candidateId, organizationId) => {
       organizationId,
     }).lean();
   };
+
+  export const updateApplicationStage = (applicationId,organizationId,stage) => {
+    return Application.findOneAndUpdate(
+      {_id: applicationId,organizationId},
+      {stage},
+      {new: true}
+    ).lean();
+  };

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { APPLICATION_STAGES } from "../constants/application.constants.js";
 
 export const isNonEmptyString = (value) => {
   if (typeof value !== "string") return false;
@@ -81,3 +82,9 @@ export const isValidJobStatus = (status) => {
 export const isValidObjectId = (value) => {
   return mongoose.Types.ObjectId.isValid(value);
 };
+
+export const isValidApplicationStage = (stage) => {
+
+    if (!isNonEmptyString(stage))  return false;
+    return APPLICATION_STAGES.includes(stage);
+  };

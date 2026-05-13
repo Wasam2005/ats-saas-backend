@@ -8,7 +8,8 @@ import {
   isValidTitle,
   isValidDescription,
   isValidJobStatus,
-  isValidObjectId
+  isValidObjectId,
+  isValidApplicationStage
 } from "../utils/validators.util.js";
 import { sanitizeString, sanitizeSkills, sanitizeJobStatus } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
@@ -245,3 +246,19 @@ export const validateApplicationInput =(req, res, next) => {
     next();
   };
   
+  export const validateApplicationStageInput = (req, res, next) => {
+
+    let { stage } = req.body;
+    stage = sanitizeString(stage).toLowerCase();
+
+    if (!isValidApplicationStage(stage)){
+      return badRequest(res, {
+        reason: "invalid_application_stage",
+        source: "validateApplicationStageInput",
+        message: "Valid application stage is required",
+      });
+    }
+
+    req.body.stage = stage;
+    next();
+  };
