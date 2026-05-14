@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import candidateRoutes from "./routes/candidate.routes.js";
 import jobRoutes from "./routes/job.routes.js";
 import applicationsRoutes from "./routes/application.routes.js"
+import interviewsRoutes from "./routes/interview.routes.js"
 
 const app = express();
 
@@ -13,5 +14,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/candidates", candidateRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/applications", applicationsRoutes);
+app.use("/api/interviews",interviewsRoutes);
 
 export default app;

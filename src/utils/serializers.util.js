@@ -34,3 +34,17 @@ export const serializeApplication = (application) => {
     updatedAt: application.updatedAt,
   };
 };
+
+export const serializeInterview = (interview) => {
+    return {
+      id: interview._id,
+      applicationId:interview.applicationId,
+      interviewerId:interview.interviewerId,
+      scheduledAt:interview.scheduledAt,
+      status:interview.status,
+      feedback: interview.feedback,
+      score:interview.score,
+      createdAt:interview.createdAt,
+      updatedAt:interview.updatedAt,
+    };
+  };

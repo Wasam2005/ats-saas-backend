@@ -9,9 +9,11 @@ import {
   isValidDescription,
   isValidJobStatus,
   isValidObjectId,
-  isValidApplicationStage
+  isValidApplicationStage,
+   isValidDate,
+  isFutureDate,
 } from "../utils/validators.util.js";
-import { sanitizeString, sanitizeSkills, sanitizeJobStatus } from "../utils/sanitizers.util.js";
+import { sanitizeString, sanitizeSkills, sanitizeJobStatus, sanitizeDate, } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
 import mongoose from "mongoose";
 
@@ -227,7 +229,7 @@ if (!isValidJobStatus(status)) {
 export const validateApplicationInput =(req, res, next) => {
     const { candidateId, jobId } = req.body;
    
-  if (!candidateId ||!isValidObjectId(candidateId)){
+  if (!isValidObjectId(candidateId)){
       return badRequest(res, {
         reason: "invalid_candidate_id",
         source: "validateApplicationInput",
@@ -235,7 +237,7 @@ export const validateApplicationInput =(req, res, next) => {
       });
     }
 
-    if (!jobId || !isValidObjectId(jobId)){
+    if (!isValidObjectId(jobId)){
       return badRequest(res, {
         reason: "invalid_job_id",
         source:"validateApplicationInput",
@@ -260,5 +262,49 @@ export const validateApplicationInput =(req, res, next) => {
     }
 
     req.body.stage = stage;
+    next();
+  };
+
+
+export const validateInterviewInput = (req, res, next) => {
+    let {applicationId,interviewerId,scheduledAt} = req.body;
+   
+    if (!isValidObjectId(applicationId)) {
+      return badRequest(res, {
+        reason:"invalid_application_id",
+        source:"validateInterviewInput",
+        message:"Valid application id is required",
+      });
+    }
+
+
+
+    if (!isValidObjectId(interviewerId)) {
+      return badRequest(res, {
+        reason:"invalid_interviewer_id",
+        source:"validateInterviewInput",
+        message:"Valid interviewer id is required",
+      });
+    }
+
+    scheduledAt = sanitizeDate(scheduledAt);
+    if (!isValidDate(scheduledAt)) {
+      return badRequest(res, {
+        reason:"invalid_scheduled_time",
+        source:"validateInterviewInput",
+        message:"Invalid interview schedule time",
+      });
+    }
+
+    if (!isFutureDate(scheduledAt)) {
+      return badRequest(res, {
+        reason:"past_interview_schedule",
+        source:"validateInterviewInput",
+        message: "Interview must be scheduled in future",
+      });
+    }
+  
+    req.body.scheduledAt = scheduledAt;
+
     next();
   };

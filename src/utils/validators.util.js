@@ -80,6 +80,8 @@ export const isValidJobStatus = (status) => {
 
 
 export const isValidObjectId = (value) => {
+    if (!isNonEmptyString(value)) return false;
+  
   return mongoose.Types.ObjectId.isValid(value);
 };
 
@@ -88,3 +90,15 @@ export const isValidApplicationStage = (stage) => {
     if (!isNonEmptyString(stage))  return false;
     return APPLICATION_STAGES.includes(stage);
   };
+
+  export const isValidDate = (value) =>{
+  if (!value) return false;
+  const parsedDate = new Date(value);
+  return !Number.isNaN(parsedDate.getTime());
+};
+
+export const isFutureDate = (value) => {
+  if (!isValidDate(value)) return false;
+
+  return (new Date(value) >  new Date());
+};

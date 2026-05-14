@@ -31,3 +31,12 @@ export const sanitizeJobStatus = (status) => {
   }
   return sanitizeString(status).toLowerCase();
 };
+
+
+export const sanitizeDate = (value) => {
+
+  if (!value) return null;
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return null;
+  return parsedDate;
+};
