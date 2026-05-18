@@ -1,8 +1,8 @@
 import express from "express";
-import { createJob, getJobs, getJobById } from "../controllers/job.controller.js";
+import { createJob, getJobs, getJobById, updateJobStatus } from "../controllers/job.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
-import { validateObjectId,validateJobInput } from "../middleware/validate-request.middleware.js";
+import { validateObjectId,validateJobInput,validateJobStatus } from "../middleware/validate-request.middleware.js";
 
 const router = express.Router();
 
@@ -29,4 +29,11 @@ router.get("/:jobId",
   getJobById
 );
 
+router.patch("/:jobId/status",
+  authMiddleware,
+  authorizeRoles("owner","admin","recruiter"),
+  validateObjectId("jobId"),
+validateJobStatus("body"),
+updateJobStatus
+);
 export default router;

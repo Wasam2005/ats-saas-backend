@@ -29,7 +29,6 @@ const candidate = await findCandidateById(candidateId,organizationId);
       throw new Error("CANDIDATE_NOT_FOUND");
     }
 
-    // 🔹 Verify job exists
     const job = await findJobById(jobId,organizationId);
 
     if (!job) {
@@ -39,11 +38,11 @@ const candidate = await findCandidateById(candidateId,organizationId);
         source: "createApplicationService",
       });
 
-      throw new Error("JOB_NOT_FOUND");
+      throw new Error("JOB_NOT_OPEN");
     }
 
    
-    if (job.status === "closed") {
+    if (job.status !== "open") {
       logWarn("application_job_closed", {
         jobId,
         organizationId,

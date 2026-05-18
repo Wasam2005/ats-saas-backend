@@ -2,8 +2,10 @@ import {
   createJob,
   findJobById,
   findJobsByOrganization,
-  findJobsByStatus
+  findJobsByStatus,
+   updateJobStatus
 } from "../repositories/job.repository.js";
+import { ALLOWED_JOB_TRANSITIONS} from "../constants/job.constant.js";
 import { logInfo, logWarn, logError} from "../utils/logger.util.js";
 
 
@@ -64,3 +66,52 @@ export const getJobsService = async (organizationId) => {
 export const getJobsByStatusService = async (organizationId, status) => {
   return findJobsByStatus(status, organizationId);
 };
+
+
+export const updateJobStatusService = async ({jobId,organizationId,status}) => {
+
+    const job = await findJobById(jobId,organizationId);
+
+    if (!job) { 
+      logWarn("job_not_found",
+        {
+          jobId,
+          organizationId,
+          source:"updateJobStatusService",
+        }
+      );
+
+      throw new Error("JOB_NOT_FOUND");
+    }
+
+
+    const allowedTransitions = ALLOWED_JOB_TRANSITIONS[job.status];
+
+    if (!allowedTransitions.includes(status)) {
+      logWarn("invalid_job_transition",
+        {
+          jobId,
+          currentStatus:job.status,
+          nextStatus: status,
+          organizationId,
+          source:"updateJobStatusService",
+        }
+      );
+
+      throw new Error("INVALID_JOB_TRANSITION");
+    }
+    
+    const updatedJob = await updateJobStatus(jobId,organizationId,status);
+
+    logInfo("job_status_updated",
+      {
+        jobId,
+        previousStatus:job.status,
+        newStatus:status,
+        organizationId,
+        source:"updateJobStatusService",
+      }
+    );
+
+    return updatedJob;
+  };

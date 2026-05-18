@@ -3,6 +3,7 @@ import {
   getJobByIdService,
   getJobsService,
   getJobsByStatusService,
+   updateJobStatusService,
 } from "../services/job.service.js";
 import { serializeJob } from "../utils/serializers.util.js";
 import { badRequest, serverError} from "../utils/response.util.js";
@@ -84,3 +85,49 @@ export const getJobById = async (req,res) => {
     });
   }
 };
+
+export const updateJobStatus = async (req, res) => {
+    try {
+      const { jobId } =req.params;
+      const { status } = req.body;
+      const organizationId = req.user.organizationId;
+      const updatedJob = await updateJobStatusService({
+          jobId,
+          organizationId,
+          status,
+        });
+
+      return res.status(200).json({
+        success: true,
+        data: updatedJob,
+        message:"Job status updated successfully",
+      });
+
+    } catch (error) {
+      if (error.message ==="JOB_NOT_FOUND") {
+        return badRequest(res, {
+          reason:"job_not_found",
+          source:"updateJobStatus",
+          message:"Job not found",
+          log: false,
+        });
+      }
+
+
+      if (error.message ==="INVALID_JOB_TRANSITION") {
+        return badRequest(res, {
+          reason:"invalid_job_transition",
+          source:"updateJobStatus",
+          message:"Invalid job status transition",
+
+          log: false,
+        });
+      }
+
+      return serverError(res, {
+        error,
+        source:"updateJobStatus",
+        context:"job_status_update_failed",
+      });
+    }
+  };

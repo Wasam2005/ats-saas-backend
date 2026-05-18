@@ -15,3 +15,10 @@ export const findJobsByOrganization = (organizationId) => {
 export const findJobsByStatus = (status, organizationId) => {
     return Job.find({ status, organizationId}).lean();
 };
+
+export const updateJobStatus = (jobId,organizationId,status) =>{
+    return Job.findOneAndUpdate(
+      {_id: jobId, organizationId},
+      {status},
+      {new: true}).lean();
+  };

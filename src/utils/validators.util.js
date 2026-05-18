@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { APPLICATION_STAGES } from "../constants/application.constants.js";
-
+import {JOB_STATUSES} from "../constants/job.constant.js";
 export const isNonEmptyString = (value) => {
   if (typeof value !== "string") return false;
 
@@ -69,14 +69,12 @@ export const isValidDescription = (description) => {
   return true;
 };
 
+
+
 export const isValidJobStatus = (status) => {
-  if (!isNonEmptyString(status)) return false;
-  
-
-  const allowedStatuses = ["draft","open","closed"];
-
-  return allowedStatuses.includes(status);
-};
+    if (!isNonEmptyString(status)) {return false;}
+    return JOB_STATUSES.includes(status);
+  };
 
 
 export const isValidObjectId = (value) => {
@@ -102,3 +100,4 @@ export const isFutureDate = (value) => {
 
   return (new Date(value) >  new Date());
 };
+

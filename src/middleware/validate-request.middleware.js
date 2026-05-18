@@ -16,6 +16,8 @@ import {
 import { sanitizeString, sanitizeSkills, sanitizeJobStatus, sanitizeDate, } from "../utils/sanitizers.util.js";
 import { badRequest } from "../utils/response.util.js";
 import mongoose from "mongoose";
+ import {JOB_STATUSES} from "../constants/job.constant.js";
+
 
 // Validate and sanitize register input
 export const validateRegisterInput = (req,res,next) =>{
@@ -210,19 +212,22 @@ export const validateJobInput = (req,res,next) => {
   next();
 };
 
-export const validateJobStatus = (req, res, next) => {
-    let { status } = req.query;
-
-if (status !== undefined) status = sanitizeJobStatus(status);
-if (!isValidJobStatus(status)) {
+export const validateJobStatus = (source = "body") => {
+  return (req, res, next) =>{
+ let status = req[source]?.status;
+    if (status !== undefined) {
+      status = sanitizeJobStatus(status);
+    }
+    if (!isValidJobStatus(status)) {
       return badRequest(res, {
         reason: "invalid_job_status",
         source: "validateJobStatus",
         message: "Invalid job status",
       });
     }
-    req.query.status = status;
+    req[source].status = status;
     next();
+  };
   };
 
   // Validate application input
@@ -308,3 +313,4 @@ export const validateInterviewInput = (req, res, next) => {
 
     next();
   };
+

@@ -35,9 +35,9 @@ export const createApplication =async (req, res) => {
           log: false,
         });
       }
-      if (error.message ==="JOB_NOT_FOUND") {
-        return badRequest(res, {
-          reason: "job_not_found",
+      if (error.message ==="JOB_NOT_OPEN") {
+        return badRequest(reOUNDs, {
+          reason: "job_not_open",
           source:"createApplication",
           message: "Job not found",
           log: false,
